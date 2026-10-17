@@ -1,0 +1,73 @@
+defaults:
+  - _self_
+
+# Root containing the default GT and generated subdirectories.
+input_dir: ???
+gt_dir: null
+generated_dir: null
+gt_subdir: gt
+generated_subdir: generated
+
+output_dir: eval_outputs
+video_glob: "**/*.mp4"
+max_videos: null
+
+# Select any subset of: psnr, ssim, lpips, fid, fvd, mse.
+metrics:
+  - ssim
+  - psnr
+  - lpips
+  - fid
+  - fvd
+
+device: auto
+seed: 42
+skip_first_n_frames: 0
+continue_on_metric_error: false
+
+pairing:
+  case_sensitive: true
+  gt_suffixes:
+    - "_gt"
+    - "_ground_truth"
+    - "-gt"
+  generated_suffixes:
+    - "_generated"
+    - "_gen"
+    - "_pred"
+    - "_prediction"
+    - "-generated"
+    - "-gen"
+    - "-pred"
+
+strict:
+  require_equal_frames: true
+  require_equal_resolution: true
+  fail_on_missing_pairs: false
+  fail_on_frame_mismatch: false
+  fail_on_video_error: false
+
+batch_size:
+  lpips: 64
+  fid: 64
+  fvd: 8
+
+lpips:
+  net: alex
+
+fvd:
+  # Null keeps each clip's original frame count. Set an integer to pad/truncate.
+  target_len: null
+
+logging:
+  level: INFO
+  log_file: evaluation.log
+
+hydra:
+  job:
+    chdir: false
+  run:
+    dir: ${output_dir}/hydra/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${output_dir}/hydra_multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
